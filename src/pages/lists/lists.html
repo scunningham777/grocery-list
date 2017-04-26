@@ -1,0 +1,31 @@
+<ion-header>
+    <ion-navbar>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="createAndAddList()">
+                <ion-icon name="add"></ion-icon>
+            </button>
+        </ion-buttons>
+        <ion-title>
+            Grocery Lists
+        </ion-title>
+    </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+    <ion-list no-lines>
+        <ion-item-sliding *ngFor="let list of lists" #listItem>
+            <ion-item (click)="viewList(list.id)">
+                {{list.name}}
+                <ion-badge *ngIf="list.itemCount > 0" item-right>{{list.itemCount}}</ion-badge>
+            </ion-item>
+            <ion-item-options>
+                <button ion-button color="danger" (click)="deleteList(list.id, listItem)">
+                    delete
+                </button>
+                <button ion-button color="secondary" (click)="editList(list.id, listItem)">
+                    edit
+                </button>
+            </ion-item-options>
+        </ion-item-sliding>
+    </ion-list>
+</ion-content>

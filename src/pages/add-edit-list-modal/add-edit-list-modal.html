@@ -1,0 +1,23 @@
+<ion-header>
+
+    <ion-navbar>
+        <ion-title>{{title}}</ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="dismiss()">
+                <ion-icon name="close"></ion-icon>
+            </button>
+        </ion-buttons>
+    </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+    <form [formGroup]="listForm" (ngSubmit)="submit()">
+        <ion-item no-padding>
+            <ion-label floating>List Name</ion-label>
+            <ion-input type="text" formControlName="name"></ion-input>
+        </ion-item>
+        <button ion-button full margin-top type="submit" [disabled]="!listForm.valid">Submit</button>
+    </form>
+</ion-content>
