@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, ModalController, ItemSliding } from 'ionic-angular';
+import { Observable } from 'rxjs/Observable';
 
 import { ListService } from '../../providers/list-service';
 
@@ -9,7 +10,7 @@ import { ListService } from '../../providers/list-service';
     templateUrl: 'lists.html'
 })
 export class ListsPage {
-    public lists: any[];
+    public lists: Observable<any[]>;
 
     constructor(
         public navCtrl: NavController,
@@ -34,14 +35,14 @@ export class ListsPage {
 
     deleteList(id: string, item: ItemSliding) {
         item.close();
-        this.lists = this.listSvc.deleteList(id);
+        this.listSvc.deleteList(id);
     }
 
     presentAddEditModal(listId?: string) {
         let modal = this.modalCtrl.create('AddEditListModal', {listId: listId});
-        modal.onDidDismiss(() => {
-            this.lists = this.listSvc.getAllActiveLists();
-        });
+        // modal.onDidDismiss(() => {
+        //     this.lists = this.listSvc.getAllActiveLists();
+        // });
         modal.present();
     }
 }

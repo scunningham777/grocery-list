@@ -13,16 +13,16 @@
 
 <ion-content padding>
     <ion-list no-lines>
-        <ion-item-sliding *ngFor="let list of lists" #listItem>
-            <ion-item (click)="viewList(list.id)">
+        <ion-item-sliding *ngFor="let list of lists | async" #listItem>
+            <ion-item (click)="viewList(list.$key)">
                 {{list.name}}
                 <ion-badge *ngIf="list.itemCount > 0" item-right>{{list.itemCount}}</ion-badge>
             </ion-item>
             <ion-item-options>
-                <button ion-button color="danger" (click)="deleteList(list.id, listItem)">
+                <button ion-button color="danger" (click)="deleteList(list.$key, listItem)">
                     delete
                 </button>
-                <button ion-button color="secondary" (click)="editList(list.id, listItem)">
+                <button ion-button color="secondary" (click)="editList(list.$key, listItem)">
                     edit
                 </button>
             </ion-item-options>

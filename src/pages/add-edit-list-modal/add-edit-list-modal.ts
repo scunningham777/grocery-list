@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import { IonicPage, NavParams, ViewController, Loading, LoadingController } from 'ionic-angular';
-import { ListService } from '../../providers/list-service';
+import { ListService, IList } from '../../providers/list-service';
 
 @IonicPage()
 @Component({
@@ -21,16 +21,16 @@ export class AddEditListModal {
         public listSvc: ListService,
         formBuilder: FormBuilder
     ) {
-        let listName = '';
         this.listId = navParams.get('listId');
         if (this.listId != null) {
             this.title = 'Edit a List';
-            // this.presentLoading();
-            listName = this.listSvc.getListById(this.listId).name;
-            this.listForm = formBuilder.group({
-                name: [listName, Validators.required]
-            })
-            // this.loading.dismiss();
+            this.presentLoading();
+            this.listSvc.getListById(this.listId).subscribe((list: IList) => {
+                this.listForm = formBuilder.group({
+                    name: [list.name, Validators.required]
+                })
+                this.loading.dismiss();
+            });
         } else {
             this.listForm = formBuilder.group({
                 name: ['', Validators.required]

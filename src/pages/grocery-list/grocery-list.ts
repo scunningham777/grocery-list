@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavParams } from 'ionic-angular';
+import { Observable } from 'rxjs/Observable';
 
 import { ListService, IList } from '../../providers/list-service';
 
@@ -9,13 +10,14 @@ import { ListService, IList } from '../../providers/list-service';
     templateUrl: 'grocery-list.html',
 })
 export class GroceryListPage {
-    public list: IList;
+    public list$: Observable<IList>;
 
     constructor(
         public navParams: NavParams,
         public listSvc: ListService
     ) {
-        this.list = this.listSvc.getListById(navParams.get('listId'));
+        this.list$ = listSvc.getListById(navParams.get('listId'));
+        //this is returning a list observable - any way to get it to be an object observable?
     }
 
     ionViewDidLoad() {
