@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import { IonicPage, NavParams, ViewController, Loading, LoadingController } from 'ionic-angular';
-import { ListService, IList } from '../../providers/list-service';
+import { ListService } from '../../providers/list-service';
+import { IList } from '../../models/models';
 
 @IonicPage()
 @Component({
@@ -15,7 +16,7 @@ export class AddEditListModal {
     public loading: Loading
 
     constructor(
-        public viewCtrl: ViewController, 
+        public viewCtrl: ViewController,
         public loadingCtrl: LoadingController,
         public navParams: NavParams,
         public listSvc: ListService,

@@ -1,12 +1,9 @@
 <ion-header>
-
-  <ion-navbar>
-    <ion-title>{{(list$ | async)?.name}}</ion-title>
-  </ion-navbar>
-
+    <ion-navbar>
+        <ion-title>{{(list$ | async)?.name}}</ion-title>
+    </ion-navbar>
 </ion-header>
 
-
 <ion-content padding>
-  Data for List ID {{(list$ | async)?.$key}}
+    Data for List ID {{(list$ | async)?.$key}}
 </ion-content>

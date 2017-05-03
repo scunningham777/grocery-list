@@ -3,13 +3,13 @@ import { IonicPage, NavController } from 'ionic-angular';
 
 @IonicPage()
 @Component({
-  selector: 'grosh-recipes-page',
-  templateUrl: 'recipes.html'
+    selector: 'grosh-recipes-page',
+    templateUrl: 'recipes.html'
 })
 export class RecipesPage {
 
-  constructor(public navCtrl: NavController) {
+    constructor(public navCtrl: NavController) {
 
-  }
+    }
 
 }

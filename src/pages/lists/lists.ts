@@ -30,7 +30,7 @@ export class ListsPage {
     }
 
     viewList(id: string) {
-        this.navCtrl.push('GroceryListPage', {listId: id});
+        this.navCtrl.push('GroceryListPage', { listId: id });
     }
 
     deleteList(id: string, item: ItemSliding) {
@@ -39,10 +39,7 @@ export class ListsPage {
     }
 
     presentAddEditModal(listId?: string) {
-        let modal = this.modalCtrl.create('AddEditListModal', {listId: listId});
-        // modal.onDidDismiss(() => {
-        //     this.lists = this.listSvc.getAllActiveLists();
-        // });
+        let modal = this.modalCtrl.create('AddEditListModal', { listId: listId });
         modal.present();
     }
 }

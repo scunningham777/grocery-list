@@ -3,14 +3,14 @@ import { IonicPageModule } from 'ionic-angular';
 import { ListsPage } from './lists';
 
 @NgModule({
-  declarations: [
-    ListsPage,
-  ],
-  imports: [
-    IonicPageModule.forChild(ListsPage),
-  ],
-  exports: [
-    ListsPage
-  ]
+    declarations: [
+        ListsPage,
+    ],
+    imports: [
+        IonicPageModule.forChild(ListsPage),
+    ],
+    exports: [
+        ListsPage
+    ]
 })
-export class ListsPageModule {}
+export class ListsPageModule { }
