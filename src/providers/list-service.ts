@@ -3,7 +3,7 @@ import { Observable } from 'rxjs/observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/find';
 import 'rxjs/add/operator/filter';
-import { AngularFire, FirebaseListObservable } from 'angularfire2';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2';
 
 import { IList } from '../models/models';
 
@@ -12,10 +12,10 @@ export class ListService {
     public allLists$: FirebaseListObservable<IList[]>;
 
     constructor(
-        public af: AngularFire
+        public db: AngularFireDatabase
     ) {
         console.log('Hello ListService Provider');
-        this.allLists$ = af.database.list('/lists');
+        this.allLists$ = db.list('/lists');
     }
 
     getAllActiveLists(): Observable<IList[]> {
@@ -28,15 +28,11 @@ export class ListService {
     }
 
     getListById(listKey: string): Observable<IList> {
-        return this.allLists$.map((lists) => {
-            return lists.find((list) => {
-                return list.$key == listKey;
-            })
-        });
+        return this.db.object('/lists/' + listKey);
     }
 
     addNewList(name: string) {
-        let newList: IList = { name: name, isActive: false, dateCreated: new Date().toLocaleDateString() };
+        let newList: IList = { name: name, isActive: true, dateCreated: new Date().getTime().toString() };
         this.allLists$.push(newList);
     }
 

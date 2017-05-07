@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 import { IonicPage, NavParams } from 'ionic-angular';
 import { Observable } from 'rxjs/Observable';
 
-import { ListService, IList } from '../../providers/list-service';
+import { ListService } from '../../providers/list-service';
+import { IList } from '../../models/models';
 
 @IonicPage()
 @Component({

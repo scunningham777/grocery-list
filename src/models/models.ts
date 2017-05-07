@@ -3,6 +3,17 @@ export interface IUser {
     dateCreated: string
 }
 
+export class User {
+    constructor(
+        public $key: string,
+        public dateCreated: string
+    ) {}
+
+    fromJson({$key, dateCreated}): User {
+        return new User($key, dateCreated);
+    }
+}
+
 export interface IList {
     $key?: string,
     name: string,
