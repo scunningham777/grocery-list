@@ -1,5 +1,10 @@
 <ion-header>
     <ion-navbar>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="createAndAddListItem()">
+                <ion-icon name="add"></ion-icon>
+            </button>
+        </ion-buttons>
         <ion-title>{{(list$ | async)?.name}}</ion-title>
     </ion-navbar>
 </ion-header>

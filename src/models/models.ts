@@ -1,61 +1,126 @@
-export interface IUser {
-    $key?: string,
-    dateCreated: string
-}
-
 export class User {
     constructor(
         public $key: string,
         public dateCreated: string
-    ) {}
+    ) { }
 
-    fromJson({$key, dateCreated}): User {
+    static fromJson({ $key, dateCreated }): User {
         return new User($key, dateCreated);
+    }
+
+    static fromJsonList(users): User[] {
+        return users.map(User.fromJson);
     }
 }
 
-export interface IList {
-    $key?: string,
-    name: string,
-    isActive: boolean,
-    dateCreated: string
+export class List {
+    constructor(
+        public $key: string,
+        public name: string,
+        public isActive: boolean,
+        public dateCreated: string
+    ) { }
+
+    static fromJson({ $key, name, isActive, dateCreated }): List {
+        return new List($key, name, isActive, dateCreated);
+    }
+
+    static fromJsonList(lists): List[] {
+        return lists.map(List.fromJson);
+    }
 }
 
-export interface IRecipe {
-    $key?: string,
-    name: string,
-    isActive: boolean,
-    dateCreated: string
+export class Recipe {
+    constructor(
+        public $key: string,
+        public name: string,
+        public isActive: boolean,
+        public dateCreated: string
+    ) { }
+
+    static fromJson({ $key, name, isActive, dateCreated }): Recipe {
+        return new Recipe($key, name, isActive, dateCreated);
+    }
+
+    static fromJsonList(recipes): Recipe[] {
+        return recipes.map(Recipe.fromJson);
+    }
 }
 
-export interface IItem {
-    $key?: string,
-    name: string,
-    categoryId: string
+export class Item {
+    constructor(
+        public $key: string,
+        public name: string,
+        public categoryId: string
+    ) { }
+
+    static fromJson({ $key, name, categoryId }): Item {
+        return new Item($key, name, categoryId);
+    }
+
+    static fromJsonList(items): Item[] {
+        return items.map(Item.fromJson);
+    }
 }
 
-export interface IListItem {
-    $key?: string,
-    itemId: string,
-    quantity: number,
-    isCompleted: boolean
-}
+export class ListItem {
+    constructor(
+        public $key: string,
+        public itemId: string,
+        public quantity: number,
+        public isCompleted: boolean
+    ) {}
 
-export interface IItemPurchase {
-    $key?: string,
-    cost: string,
-    vendorId: string,
-    dateOfPurchase: string
-}
+    static fromJson({ $key, itemId, quantity, isCompleted }): ListItem {
+        return new ListItem($key, itemId, quantity, isCompleted);
+    }
 
-export interface ICategory {
-    $key?: string,
-    name: string,
-    isActive: boolean
-}
+    static fromJsonList(listItems): ListItem[] {
+        return listItems.map(ListItem.fromJson);
+    }}
 
-export interface IVendor {
-    $key?: string,
-    name: string,
-    isActive: boolean
-}
+export class ItemPurchase {
+    constructor(
+        public $key: string,
+        public cost: string,
+        public vendorId: string,
+        public dateOfPurchase: string
+    ) {}
+
+    static fromJson({ $key, cost, vendorId, dateOfPurchase }): ItemPurchase {
+        return new ItemPurchase($key, cost, vendorId, dateOfPurchase);
+    }
+
+    static fromJsonList(itemPurchases): ItemPurchase[] {
+        return itemPurchases.map(ItemPurchase.fromJson);
+    }}
+
+export class Category {
+    constructor(
+        public $key: string,
+        public name: string,
+        public isActive: boolean
+    ) {}
+
+    static fromJson({ $key, name, isActive }): Category {
+        return new Category($key, name, isActive);
+    }
+
+    static fromJsonList(categories): Category[] {
+        return categories.map(Category.fromJson);
+    }}
+
+export class Vendor {
+    constructor(
+        public $key: string,
+        public name: string,
+        public isActive: boolean
+    ) {}
+
+    static fromJson({ $key, name, isActive }): Vendor {
+        return new Vendor($key, name, isActive);
+    }
+
+    static fromJsonList(vendors): Vendor[] {
+        return vendors.map(Vendor.fromJson);
+    }}

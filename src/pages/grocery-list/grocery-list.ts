@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavParams } from 'ionic-angular';
+import { IonicPage, NavParams, ModalController } from 'ionic-angular';
 import { Observable } from 'rxjs/Observable';
 
 import { ListService } from '../../providers/list-service';
-import { IList } from '../../models/models';
+import { List } from '../../models/models';
 
 @IonicPage()
 @Component({
@@ -11,18 +11,26 @@ import { IList } from '../../models/models';
     templateUrl: 'grocery-list.html',
 })
 export class GroceryListPage {
-    public list$: Observable<IList>;
+    public list: List;
 
     constructor(
         public navParams: NavParams,
-        public listSvc: ListService
+        public listSvc: ListService,
+        public modalCtrl: ModalController
     ) {
-        this.list$ = listSvc.getListById(navParams.get('listId'));
-        //this is returning a list observable - any way to get it to be an object observable?
+        listSvc.getListById(navParams.get('listId'))
+            .subscribe(list => {
+                this.list = list;
+            });
     }
 
     ionViewDidLoad() {
         console.log('ionViewDidLoad GroceryList');
+    }
+
+    createAndAddListItem() {
+        let modal = this.modalCtrl.create('AddListItemModal');
+        modal.present();
     }
 
 }

@@ -1,46 +1,44 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/observable';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/find';
-import 'rxjs/add/operator/filter';
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2';
+import { AngularFireDatabase } from 'angularfire2';
 
-import { IList } from '../models/models';
+import { List } from '../models/models';
 
 @Injectable()
 export class ListService {
-    public allLists$: FirebaseListObservable<IList[]>;
 
     constructor(
         public db: AngularFireDatabase
     ) {
-        console.log('Hello ListService Provider');
-        this.allLists$ = db.list('/lists');
     }
 
-    getAllActiveLists(): Observable<IList[]> {
+    getAllActiveLists(): Observable<List[]> {
         console.log('all lists requested')
-        return this.allLists$.map((lists: IList[]) => {
-            return lists.filter((list: IList) => {
-                return list.isActive;
-            })
+        return this.db.list('lists')
+            .map(List.fromJsonList)
+            .map((lists: List[]) => {
+                return lists.filter((list: List) => {
+                    return list.isActive;
+                })
         });
     }
 
-    getListById(listKey: string): Observable<IList> {
-        return this.db.object('/lists/' + listKey);
+    getListById(listKey: string): Observable<List> {
+        return this.db.object('lists/' + listKey).map(List.fromJson);
     }
 
     addNewList(name: string) {
-        let newList: IList = { name: name, isActive: true, dateCreated: new Date().getTime().toString() };
-        this.allLists$.push(newList);
+        const newList = { name: name, isActive: true, dateCreated: new Date().getTime().toString() };
+
+        this.db.list('lists').push(newList);
     }
 
     updateListNameById(listKey: string, newName: string) {
-        this.allLists$.update(listKey, { name: newName });
+        this.db.list('lists').update(listKey, { name: newName });
     }
 
     deleteList(listKey: string) {
-        this.allLists$.update(listKey, { isDeleted: true });
+        this.db.list('lists').update(listKey, { isDeleted: true });
     }
 }
