@@ -2,8 +2,12 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/first';
+import 'rxjs/add/observable/of';
 import { FirebaseApp } from 'angularfire2';
 import { AngularFireDatabase } from 'angularfire2/database';
+import { Item } from '../models/models';
 
 @Injectable()
 export class ListItemService {
@@ -18,19 +22,62 @@ export class ListItemService {
 
     addNewListItem(listId: string, itemName: string, itemId?: string): Observable<any> {
         let dataToSave = {};
+        let itemId$: Observable<string>;
+        let update$: Observable<any>;
+
         if (!itemId) {
-            itemId = this.sdkDb.child('items').push().key;
-            dataToSave['items/' + itemId] = {name: itemName, categoryId: null};
+            itemId$ = this.db.list('items', {
+                query: {
+                    orderByChild: 'name',
+                    equalTo: itemName
+                }
+            }).first().map((items: any[]) => {
+                if (items.length == 0) {
+                    itemId = this.sdkDb.child('items').push().key;
+                    dataToSave['items/' + itemId] = {name: itemName, categoryId: null};
+                } else {
+                    itemId = items[0].$key;
+                }
+                return itemId;
+            })
+        } else {
+            itemId$ = Observable.of(itemId);
         }
 
-        const listItemData = {itemId: itemId, quantity: 1, isCompleted: false};
+        update$ = itemId$.switchMap(resolvedItemId => {
+            //TODO: after implementing 'getListItemsForList()', simply call that method first and call .first() on it with predicate to find if the listItem already exists
+            return this.db.list('listItems', {
+                query: {
+                    orderByChild: 'itemId',
+                    equalTo: resolvedItemId
+                }
+            }).first().map((listItems: any[]) => {
+                if (listItems.length == 0) {
+                    const listItemData = {itemId: resolvedItemId, quantity: 1, isCompleted: false};
 
-        const newListItemKey = this.sdkDb.child('listItems').push().key;
+                    const newListItemKey = this.sdkDb.child('listItems').push().key;
 
-        dataToSave[`listItems/${newListItemKey}`] = listItemData;
-        dataToSave[`listItemsPerList/${listId}/${newListItemKey}`] = true;
+                    dataToSave[`listItems/${newListItemKey}`] = listItemData;
+                    dataToSave[`listItemsPerList/${listId}/${newListItemKey}`] = true;
+                } else {
+                    dataToSave[`listItems/${listItems[0].$key}/quantity`] = listItems[0].quantity + 1;
+                }
 
-        return this.firebaseUpdate(dataToSave);
+                return this.firebaseUpdate(dataToSave);
+            });
+        })
+
+        return update$
+    }
+
+    getItemSuggestions(nameStart: string):  Observable<Item[]> {
+        return this.db.list('items')
+            .map((rawItems: Item[]): Item[] => {
+                const items = Item.fromJsonList(rawItems);
+                return items.filter((item: Item) => {
+                    return item.name.startsWith(nameStart);
+                })
+            })
     }
 
     firebaseUpdate(dataToSave) {

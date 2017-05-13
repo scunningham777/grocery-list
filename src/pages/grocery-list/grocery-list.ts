@@ -28,7 +28,7 @@ export class GroceryListPage {
     }
 
     createAndAddListItem() {
-        let modal = this.modalCtrl.create('AddListItemModal');
+        let modal = this.modalCtrl.create('AddListItemModal', {listId: this.list.$key});
         modal.present();
     }
 

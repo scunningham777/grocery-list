@@ -5,6 +5,7 @@ import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { GroshApp } from './app.component';
 import { ListService } from '../providers/list-service';
+import { ListItemService } from '../providers/list-item-service';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -36,6 +37,7 @@ export const firebaseConfig = {
         StatusBar,
         SplashScreen,
         ListService,
+        ListItemService,
         { provide: ErrorHandler, useClass: IonicErrorHandler }
     ]
 })
