@@ -5,10 +5,10 @@
                 <ion-icon name="add"></ion-icon>
             </button>
         </ion-buttons>
-        <ion-title>{{(list$ | async)?.name}}</ion-title>
+        <ion-title>{{(list)?.name}}</ion-title>
     </ion-navbar>
 </ion-header>
 
 <ion-content padding>
-    Data for List ID {{(list$ | async)?.$key}}
+    Data for List ID {{(list)?.$key}}
 </ion-content>

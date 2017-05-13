@@ -2,7 +2,8 @@ import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { AngularFireModule } from 'angularfire2';
-import { MyApp } from './app.component';
+import { AngularFireDatabaseModule } from 'angularfire2/database';
+import { GroshApp } from './app.component';
 import { ListService } from '../providers/list-service';
 
 import { StatusBar } from '@ionic-native/status-bar';
@@ -19,16 +20,17 @@ export const firebaseConfig = {
 
 @NgModule({
     declarations: [
-        MyApp
+        GroshApp
     ],
     imports: [
         BrowserModule,
-        IonicModule.forRoot(MyApp),
-        AngularFireModule.initializeApp(firebaseConfig)
+        IonicModule.forRoot(GroshApp),
+        AngularFireModule.initializeApp(firebaseConfig),
+        AngularFireDatabaseModule
     ],
     bootstrap: [IonicApp],
     entryComponents: [
-        MyApp
+        GroshApp
     ],
     providers: [
         StatusBar,

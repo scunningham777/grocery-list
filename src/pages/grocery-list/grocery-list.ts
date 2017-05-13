@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavParams, ModalController } from 'ionic-angular';
-import { Observable } from 'rxjs/Observable';
 
 import { ListService } from '../../providers/list-service';
 import { List } from '../../models/models';

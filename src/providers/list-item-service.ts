@@ -1,8 +1,9 @@
-import { Injectable, Inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/map';
-import { AngularFireDatabase, FirebaseListObservable, FirebaseRef } from 'angularfire2';
+import { FirebaseApp } from 'angularfire2';
+import { AngularFireDatabase } from 'angularfire2/database';
 
 @Injectable()
 export class ListItemService {
@@ -10,7 +11,7 @@ export class ListItemService {
 
     constructor(
         public db: AngularFireDatabase,
-        @Inject(FirebaseRef) fb
+        public fb: FirebaseApp
     ) {
         this.sdkDb = fb.database().ref();
     }
