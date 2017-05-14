@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
+import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/first';
 import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/combineLatest';
 import { FirebaseApp } from 'angularfire2';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { Item } from '../models/models';
+import { Item, ListItem } from '../models/models';
 
 @Injectable()
 export class ListItemService {
@@ -18,6 +21,33 @@ export class ListItemService {
         public fb: FirebaseApp
     ) {
         this.sdkDb = fb.database().ref();
+    }
+
+    getAllListItemsForList(listId: string): Observable<ListItem[]> {
+        const listItemsPerList$ = this.db.list(`listItemsPerList/${listId}`);
+
+        const listItems$ = listItemsPerList$
+            .map(listItemIds => listItemIds.map(liId => this.db.object(`listItems/${liId.$key}`)))
+            .mergeMap(listItem$s => Observable.combineLatest(listItem$s))
+            .map(listItems => listItems.map((li: any) => {
+                return this.db.object(`items/${li.itemId}`)
+                    .map((item: any) => {
+                        li.itemName = item.name;
+                        li.categoryId = item.categoryId;
+                        return li;
+                    });
+            }))
+            .mergeMap(listItemsWithItem$s => Observable.combineLatest(listItemsWithItem$s))
+            .map(listItemsWithItem => listItemsWithItem.map((liwi: any) => {
+                return this.db.object(`categories/${liwi.categoryId}`)
+                    .map((category: any) => {
+                        liwi.categoryName = category.name;
+                        return liwi
+                    })
+            }))
+            .mergeMap(fullListItem$s => Observable.combineLatest(fullListItem$s))
+
+        return listItems$;
     }
 
     addNewListItem(listId: string, itemName: string, itemId?: string): Observable<any> {

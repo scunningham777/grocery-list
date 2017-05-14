@@ -10,5 +10,7 @@
 </ion-header>
 
 <ion-content padding>
-    Data for List ID {{(list)?.$key}}
+    <ion-list no-lines>
+        <ion-item *ngFor="let listItem of listItems$ | async">{{listItem.itemName}} {{listItem.quantity > 1 ? '(' + listItem.quantity + ')' : ''}}</ion-item>
+    </ion-list>
 </ion-content>

@@ -67,12 +67,15 @@ export class ListItem {
     constructor(
         public $key: string,
         public itemId: string,
+        public itemName: string,
+        public categoryId: string,
+        public categoryName: string,
         public quantity: number,
         public isCompleted: boolean
     ) {}
 
-    static fromJson({ $key, itemId, quantity, isCompleted }): ListItem {
-        return new ListItem($key, itemId, quantity, isCompleted);
+    static fromJson({ $key, itemId, quantity, isCompleted, itemName, categoryId, categoryName }): ListItem {
+        return new ListItem($key, itemId, quantity, isCompleted, itemName, categoryId, categoryName);
     }
 
     static fromJsonList(listItems): ListItem[] {
