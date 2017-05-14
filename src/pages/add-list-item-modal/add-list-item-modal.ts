@@ -39,7 +39,6 @@ export class AddListItemModal {
     initSuggestionHandling() {
         this.inputSubject = new Subject<string>();
         this.suggestions$ = this.inputSubject
-            .do(() => console.log('input update'))
             .distinctUntilChanged()
             .switchMap(value => this.itemSvc.getItemSuggestions(value));
     }

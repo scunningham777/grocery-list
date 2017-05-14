@@ -30,7 +30,6 @@ export class GroceryListPage {
     }
 
     ionViewDidLoad() {
-        console.log('ionViewDidLoad GroceryList');
     }
 
     createAndAddListItem() {

@@ -14,7 +14,6 @@ export class ListService {
     }
 
     getAllActiveLists(): Observable<List[]> {
-        console.log('all lists requested')
         return this.db.list('lists')
             .map(List.fromJsonList)
             .map((lists: List[]) => {

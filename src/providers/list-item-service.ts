@@ -27,8 +27,15 @@ export class ListItemService {
         const listItemsPerList$ = this.db.list(`listItemsPerList/${listId}`);
 
         const listItems$ = listItemsPerList$
-            .map(listItemIds => listItemIds.map(liId => this.db.object(`listItems/${liId.$key}`)))
+            .map(listItemIds => {
+                    if (listItemIds.length == 0) {
+                        return [Observable.of({})];
+                    } else {
+                        return listItemIds.map(liId => this.db.object(`listItems/${liId.$key}`))
+                    }
+                })
             .mergeMap(listItem$s => Observable.combineLatest(listItem$s))
+            .do(console.log)
             .map(listItems => listItems.map((li: any) => {
                 return this.db.object(`items/${li.itemId}`)
                     .map((item: any) => {
@@ -75,26 +82,25 @@ export class ListItemService {
         }
 
         update$ = itemId$.switchMap(resolvedItemId => {
-            //TODO: after implementing 'getListItemsForList()', simply call that method first and call .first() on it with predicate to find if the listItem already exists
-            return this.db.list('listItems', {
-                query: {
-                    orderByChild: 'itemId',
-                    equalTo: resolvedItemId
-                }
-            }).first().map((listItems: any[]) => {
-                if (listItems.length == 0) {
-                    const listItemData = {itemId: resolvedItemId, quantity: 1, isCompleted: false};
+            return this.getAllListItemsForList(listId)
+                .first()
+                .map((currentListItems: ListItem[]) => {
+                    return currentListItems.filter((listItem: ListItem) => listItem.itemId == resolvedItemId);
+                })
+                .map((listItems: ListItem[]) => {
+                    if (listItems.length == 0) {
+                        const listItemData = {itemId: resolvedItemId, quantity: 1, isCompleted: false};
 
-                    const newListItemKey = this.sdkDb.child('listItems').push().key;
+                        const newListItemKey = this.sdkDb.child('listItems').push().key;
 
-                    dataToSave[`listItems/${newListItemKey}`] = listItemData;
-                    dataToSave[`listItemsPerList/${listId}/${newListItemKey}`] = true;
-                } else {
-                    dataToSave[`listItems/${listItems[0].$key}/quantity`] = listItems[0].quantity + 1;
-                }
+                        dataToSave[`listItems/${newListItemKey}`] = listItemData;
+                        dataToSave[`listItemsPerList/${listId}/${newListItemKey}`] = true;
+                    } else {
+                        dataToSave[`listItems/${listItems[0].$key}/quantity`] = listItems[0].quantity + 1;
+                    }
 
-                return this.firebaseUpdate(dataToSave);
-            });
+                    return this.firebaseUpdate(dataToSave);
+                });
         })
 
         return update$
