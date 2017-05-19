@@ -57,6 +57,10 @@ export class ListItemService {
         return listItems$;
     }
 
+    getListItemById(listItemId: string): Observable<ListItem> {
+        return Observable.of(null);
+    }
+
     addNewListItem(listId: string, itemName: string, itemId?: string): Observable<any> {
         let dataToSave = {};
         let itemId$: Observable<string>;

@@ -1,0 +1,24 @@
+<ion-header>
+    <ion-navbar>
+        <ion-title>Edit Item Details</ion-title>
+    </ion-navbar>
+    <ion-buttons end>
+        <button ion-button icon-only>
+            <ion-icon name="close"></ion-icon>
+        </button>
+    </ion-buttons>
+</ion-header>
+
+<ion-content padding>
+    <ion-list>
+        <ion-item>
+            <ion-label floating>Item Name</ion-label>
+            <ion-input [(ngModel)]="itemName" type="text"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label floating>Quantity</ion-label>
+            <ion-input [(ngModel)]="quantity" type="number"></ion-input>
+        </ion-item>
+    </ion-list>
+    <button ion-button block margin-horizontal [disabled]="!itemName">Update</button>
+</ion-content>

@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavParams, ModalController } from 'ionic-angular';
+import { IonicPage, NavParams, ModalController, ItemSliding } from 'ionic-angular';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/reduce';
 
 import { ListService } from '../../providers/list-service';
 import { ListItemService } from '../../providers/list-item-service';
 import { List, ListItem } from '../../models/models';
+import { EditListItemModal } from '../edit-list-item-modal/edit-list-item-modal';
 
 @IonicPage()
 @Component({
@@ -59,18 +60,28 @@ export class GroceryListPage {
         modal.present();
     }
 
-    checkCompletedSwipe(item, listItemId) {
-        const slidePercent = item.getSlidingPercent()
+    checkCompletedSwipe(event, listItemId) {
+        const slidePercent = event.getSlidingPercent()
         if (slidePercent < 0) {
             if (slidePercent < -2) {
                 this.completeItem(listItemId);
             } else {
-                console.dir(item);
+                console.dir(event);
             }
         }
     }
 
     completeItem(listItemId: string) {
         console.log('Item completed: ', listItemId);
+    }
+
+    editItem(listItemId: string, item: ItemSliding) {
+        item.close();
+        this.presentEditModal(listItemId);
+    }
+
+    presentEditModal(listItemId: string) {
+        let modal = this.modalCtrl.create('EditListItemModal', { listItemId: listItemId });
+        modal.present();
     }
 }
