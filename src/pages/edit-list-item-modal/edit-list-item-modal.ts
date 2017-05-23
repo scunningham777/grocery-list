@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, ViewController, NavParams, Loading, LoadingController } from 'ionic-angular';
 import { ListItemService } from '../../providers/list-item-service';
+import { ListItem } from '../../models/models';
 
 @IonicPage()
 @Component({
@@ -8,6 +9,7 @@ import { ListItemService } from '../../providers/list-item-service';
     templateUrl: 'edit-list-item-modal.html',
 })
 export class EditListItemModal {
+    public listItem: ListItem;
     public itemName: string;
     public quantity: string;
     public loading: Loading
@@ -27,7 +29,11 @@ export class EditListItemModal {
             this.dismiss();
         }
 
-        this.itemSvc.getListItemById(itemId);
+        this.itemSvc.getListItemById(itemId)
+            .subscribe(listItem => {
+                this.listItem = listItem;
+                this.loading.dismiss();
+            })
     }
 
     ionViewDidLoad() {

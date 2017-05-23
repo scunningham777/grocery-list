@@ -27,38 +27,44 @@ export class ListItemService {
         const listItemsPerList$ = this.db.list(`listItemsPerList/${listId}`);
 
         const listItems$ = listItemsPerList$
+            .do((data) => {
+                console.log('listItemPerList update');
+                console.log(data);
+            })
             .map(listItemIds => {
                     if (listItemIds.length == 0) {
                         return [Observable.of({})];
                     } else {
-                        return listItemIds.map(liId => this.db.object(`listItems/${liId.$key}`))
+                        return listItemIds.map(liId => this.getListItemById(liId.$key))
                     }
                 })
             .mergeMap(listItem$s => Observable.combineLatest(listItem$s))
             .do(console.log)
-            .map(listItems => listItems.map((li: any) => {
-                return this.db.object(`items/${li.itemId}`)
-                    .map((item: any) => {
-                        li.itemName = item.name;
-                        li.categoryId = item.categoryId;
-                        return li;
-                    });
-            }))
-            .mergeMap(listItemsWithItem$s => Observable.combineLatest(listItemsWithItem$s))
-            .map(listItemsWithItem => listItemsWithItem.map((liwi: any) => {
-                return this.db.object(`categories/${liwi.categoryId}`)
-                    .map((category: any) => {
-                        liwi.categoryName = category.name;
-                        return liwi
-                    })
-            }))
-            .mergeMap(fullListItem$s => Observable.combineLatest(fullListItem$s))
 
         return listItems$;
     }
 
     getListItemById(listItemId: string): Observable<ListItem> {
-        return Observable.of(null);
+        const baseListItem$ = this.db.object(`listItems/${listItemId}`);
+        const composedListItem$ = baseListItem$
+            .do((data) => {
+                console.log('ListItem update');
+                console.log(data);
+            })
+            .switchMap(rawListItem => {
+                return this.db.object(`items/${rawListItem.itemId}`)
+                    .switchMap(item => {
+                        return this.db.object(`categories/${item.categoryId}`)
+                            .map(category => {
+                                rawListItem.itemName = item.name;
+                                rawListItem.categoryId = item.categoryId;
+                                rawListItem.categoryName = category.name;
+                                return ListItem.fromJson(rawListItem);
+                            })
+                    })
+            })
+
+        return composedListItem$;
     }
 
     addNewListItem(listId: string, itemName: string, itemId?: string): Observable<any> {
@@ -118,6 +124,16 @@ export class ListItemService {
                     return item.name.startsWith(nameStart);
                 })
             })
+    }
+
+    deleteListItem(listId: string, listItemId: string) {
+        let dataToSave = {};
+        //delete listItemPerList
+        dataToSave[`listItemsPerList/${listId}/${listItemId}`] = null;
+        //delete listItem   
+        dataToSave[`listItems/${listItemId}`] = null,
+
+        this.firebaseUpdate(dataToSave);
     }
 
     firebaseUpdate(dataToSave) {

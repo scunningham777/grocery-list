@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavParams, ModalController, ItemSliding } from 'ionic-angular';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/reduce';
+import 'rxjs/add/operator/do';
 
 import { ListService } from '../../providers/list-service';
 import { ListItemService } from '../../providers/list-item-service';
 import { List, ListItem } from '../../models/models';
-import { EditListItemModal } from '../edit-list-item-modal/edit-list-item-modal';
 
 @IonicPage()
 @Component({
@@ -33,6 +32,11 @@ export class GroceryListPage {
         this.listItemsByCategory$ = this.listItems$
             .map((listItems: ListItem[]) => {
                 return listItems.reduce((acc, listItem: ListItem) => {
+                    //ignore this item if the name somehow got erased or if the quantity somehow got set to 0
+                    if (!listItem.itemName || !listItem.quantity) {
+                        return acc;
+                    }
+                    
                     if (acc.find(cat => cat.name == listItem.categoryName) === undefined) {
                         acc.push({
                             name: listItem.categoryName,
@@ -50,9 +54,7 @@ export class GroceryListPage {
                     }
                 })
             })
-    }
-
-    ionViewDidLoad() {
+            .do(console.log)
     }
 
     createAndAddListItem() {
@@ -75,13 +77,18 @@ export class GroceryListPage {
         console.log('Item completed: ', listItemId);
     }
 
-    editItem(listItemId: string, item: ItemSliding) {
-        item.close();
+    editItem(listItemId: string, itemElem: ItemSliding) {
+        itemElem.close();
         this.presentEditModal(listItemId);
     }
 
     presentEditModal(listItemId: string) {
         let modal = this.modalCtrl.create('EditListItemModal', { listItemId: listItemId });
         modal.present();
+    }
+
+    deleteItem(listItemId: string, itemElem: ItemSliding) {
+        itemElem.close();
+        this.itemSvc.deleteListItem(this.list.$key, listItemId);
     }
 }

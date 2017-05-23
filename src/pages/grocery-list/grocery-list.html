@@ -12,18 +12,16 @@
 <ion-content padding>
     <ion-list no-lines *ngFor="let category of (listItemsByCategory$ | async); let first=first; let last=last">
         <ion-list-header *ngIf="!(first && last && category.name == undefined)">{{category.name || "No category"}}</ion-list-header>
-        <ion-item-sliding #listItemElem *ngFor="let listItem of category.items" (ionDrag)="checkCompletedSwipe($event, listItem.$key)">
-            <ion-item (click)="editItem(listItem.$key, listItemElem)">
+        <ion-item-sliding #listItemElem *ngFor="let listItem of category.items">
+            <ion-item (click)="completeItem(listItem.$key)">
                 {{listItem.itemName}} {{listItem.quantity > 1 ? '(' + listItem.quantity + ')' : ''}}
             </ion-item>
             <ion-item-options>
                 <button ion-button color="danger" (click)="deleteItem(listItem.$key, listItemElem)">
                     delete
                 </button>
-            </ion-item-options>
-            <ion-item-options side="left">
-                <button ion-button color="secondary">
-                    complete
+                <button ion-button color="secondary" (click)="editItem(listItem.$key, listItemElem)">
+                    edit
                 </button>
             </ion-item-options>
         </ion-item-sliding>

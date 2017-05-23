@@ -74,8 +74,8 @@ export class ListItem {
         public isCompleted: boolean
     ) {}
 
-    static fromJson({ $key, itemId, quantity, isCompleted, itemName, categoryId, categoryName }): ListItem {
-        return new ListItem($key, itemId, quantity, isCompleted, itemName, categoryId, categoryName);
+    static fromJson({ $key, itemId, itemName, categoryId, categoryName, quantity, isCompleted }): ListItem {
+        return new ListItem($key, itemId, itemName, categoryId, categoryName, quantity, isCompleted);
     }
 
     static fromJsonList(listItems): ListItem[] {
