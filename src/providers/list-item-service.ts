@@ -27,10 +27,6 @@ export class ListItemService {
         const listItemsPerList$ = this.db.list(`listItemsPerList/${listId}`);
 
         const listItems$ = listItemsPerList$
-            .do((data) => {
-                console.log('listItemPerList update');
-                console.log(data);
-            })
             .map(listItemIds => {
                     if (listItemIds.length == 0) {
                         return [Observable.of({})];
@@ -39,18 +35,14 @@ export class ListItemService {
                     }
                 })
             .mergeMap(listItem$s => Observable.combineLatest(listItem$s))
-            .do(console.log)
 
         return listItems$;
     }
 
     getListItemById(listItemId: string): Observable<ListItem> {
+        //TODO: try using "combineLatest()" at each step instead of switchMap(), using a "project" function to combine data
         const baseListItem$ = this.db.object(`listItems/${listItemId}`);
         const composedListItem$ = baseListItem$
-            .do((data) => {
-                console.log('ListItem update');
-                console.log(data);
-            })
             .switchMap(rawListItem => {
                 return this.db.object(`items/${rawListItem.itemId}`)
                     .switchMap(item => {
@@ -67,26 +59,41 @@ export class ListItemService {
         return composedListItem$;
     }
 
+    getOrCreateItemByName(itemName: string): Observable<{itemId: string, isItemNew: boolean}> {
+        const itemData$ = this.db.list('items', {
+                query: {
+                    orderByChild: 'name',
+                    equalTo: itemName
+                }
+            }).first().map((items: any[]) => {
+                let responseData: any = {};
+
+                if (items.length == 0) {
+                    responseData.itemId = this.sdkDb.child('items').push().key;
+                    responseData.isItemNew = true;
+                } else {
+                    responseData.itemId = items[0].$key;
+                    responseData.isItemNew = false;
+                }
+                return responseData;
+            })
+
+        return itemData$;
+    }
+
     addNewListItem(listId: string, itemName: string, itemId?: string): Observable<any> {
         let dataToSave = {};
         let itemId$: Observable<string>;
         let update$: Observable<any>;
 
         if (!itemId) {
-            itemId$ = this.db.list('items', {
-                query: {
-                    orderByChild: 'name',
-                    equalTo: itemName
-                }
-            }).first().map((items: any[]) => {
-                if (items.length == 0) {
-                    itemId = this.sdkDb.child('items').push().key;
-                    dataToSave['items/' + itemId] = {name: itemName, categoryId: null};
-                } else {
-                    itemId = items[0].$key;
-                }
-                return itemId;
-            })
+            itemId$ = this.getOrCreateItemByName(itemName)
+                .map(itemData => {
+                    if (itemData.isItemNew) {
+                        dataToSave['items/' + itemId] = {name: itemName, categoryId: null};
+                    }
+                    return itemData.itemId;
+                })
         } else {
             itemId$ = Observable.of(itemId);
         }
@@ -136,17 +143,59 @@ export class ListItemService {
         this.firebaseUpdate(dataToSave);
     }
 
-    firebaseUpdate(dataToSave) {
+    updateListItem(newItemData: ListItem): Observable<any> {
+        let itemDiff$: Observable<{oldItemData: ListItem, alteredItemData: ListItem}>;     // alteredItemData should include an updated itemId if applicable
+        let update$: Observable<any>;
+
+        itemDiff$ = Observable.combineLatest(this.getListItemById(newItemData.$key), Observable.of(newItemData))
+            .switchMap(([oldItem, newItem]) => {
+                if (oldItem.itemName != newItem.itemName) {
+                    return this.getOrCreateItemByName(newItem.itemName)
+                        .map(({itemId}) => {
+                            newItem.itemId = itemId;
+                            return {oldItemData: oldItem, alteredItemData: newItem};
+                        });
+                } else {
+                    return Observable.of({oldItemData: oldItem, alteredItemData: newItem});
+                }
+            })
+
+        //update$ needs to return the "dataToSave" object
+        update$ = itemDiff$
+            .map(({oldItemData, alteredItemData}) => {
+                let dataToSave: any = {};
+                //compare each relevant field with original to determine updates
+                if (oldItemData.quantity != alteredItemData.quantity) {
+                    dataToSave[`listItems/${oldItemData.$key}/quantity`] = alteredItemData.quantity;
+                }
+
+                if (oldItemData.itemId != alteredItemData.itemId) {
+                    dataToSave[`listItems/${oldItemData.$key}/itemId`] = alteredItemData.itemId;
+                    dataToSave[`items/${alteredItemData.itemId}`] = {name: alteredItemData.itemName, categoryId: alteredItemData.categoryId};
+                }
+                
+                return dataToSave();
+            })
+
+        return update$.switchMap(this.firebaseUpdate);
+    }
+
+    firebaseUpdate(dataToSave): Observable<any> {
         const subject = new Subject();
 
-        this.sdkDb.update(dataToSave)
-            .then(val => {
-                subject.next(val);
-                subject.complete();
-            }, err => {
-                subject.error(err);
-                subject.complete();
-            });
+        if (!dataToSave || Object.getOwnPropertyNames(dataToSave).length == 0) {
+            subject.next(undefined);
+            subject.complete();
+        } else {
+            this.sdkDb.update(dataToSave)
+                .then(val => {
+                    subject.next(val);
+                    subject.complete();
+                }, err => {
+                    subject.error(err);
+                    subject.complete();
+                });
+        }
 
         return subject.asObservable();
     }

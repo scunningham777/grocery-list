@@ -36,16 +36,24 @@ export class EditListItemModal {
             })
     }
 
-    ionViewDidLoad() {
-        console.log('ionViewDidLoad EditListItemModalPage');
-    }
-
     presentLoading() {
         this.loading = this.loadingCtrl.create();
         this.loading.present();
     }
 
+    submitUpdate() {
+        this.presentLoading();
+
+        this.itemSvc.updateListItem(this.listItem)
+            .subscribe(() => {
+                this.dismiss();
+            })
+    }   
+
     dismiss() {
+        if (!!this.loading) {
+            this.loading.dismiss();
+        }
         this.viewCtrl.dismiss();
     }
 }

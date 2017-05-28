@@ -54,7 +54,6 @@ export class GroceryListPage {
                     }
                 })
             })
-            .do(console.log)
     }
 
     createAndAddListItem() {

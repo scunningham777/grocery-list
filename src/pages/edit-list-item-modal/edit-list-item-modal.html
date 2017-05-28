@@ -20,5 +20,5 @@
             <ion-input [(ngModel)]="listItem.quantity" type="number"></ion-input>
         </ion-item>
     </ion-list>
-    <button ion-button block [disabled]="!listItem.itemName">Update</button>
+    <button ion-button block [disabled]="!listItem.itemName" (click)="submitUpdate()">Update</button>
 </ion-content>
