@@ -52,7 +52,7 @@ export class EditListItemModal {
 
     dismiss() {
         if (!!this.loading) {
-            this.loading.dismiss();
+            //this.loading.dismiss();
         }
         this.viewCtrl.dismiss();
     }

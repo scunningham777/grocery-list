@@ -174,10 +174,10 @@ export class ListItemService {
                     dataToSave[`items/${alteredItemData.itemId}`] = {name: alteredItemData.itemName, categoryId: alteredItemData.categoryId};
                 }
                 
-                return dataToSave();
+                return dataToSave;
             })
 
-        return update$.switchMap(this.firebaseUpdate);
+        return update$.switchMap(this.firebaseUpdate.bind(this));
     }
 
     firebaseUpdate(dataToSave): Observable<any> {
