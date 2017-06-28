@@ -73,7 +73,10 @@ export class GroceryListPage {
     }
 
     completeItem(listItemId: string) {
-        console.log('Item completed: ', listItemId);
+        this.itemSvc.updateListItemCompleted(listItemId)
+            .subscribe(() => {
+                console.log('Item completed: ', listItemId);
+            })
     }
 
     editItem(listItemId: string, itemElem: ItemSliding) {

@@ -6,6 +6,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/first';
+import 'rxjs/add/operator/pluck';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/combineLatest';
 import { FirebaseApp } from 'angularfire2';
@@ -176,6 +177,26 @@ export class ListItemService {
                 
                 return dataToSave;
             })
+
+        return update$.switchMap(this.firebaseUpdate.bind(this));
+    }
+
+    updateListItemCompleted(listItemKey: string, isCompleted?: boolean): Observable<any> {
+        let dataToSave: any = {};
+        let update$;
+
+        if (isCompleted != null) {
+            dataToSave[`listItems/${listItemKey}/isCompleted`] = isCompleted;
+            update$ = Observable.of(dataToSave);
+        } else {
+            update$ = this.getListItemById(listItemKey)
+                        .first()
+                        .pluck('isCompleted')
+                        .map((isCompleted: boolean) => {
+                            dataToSave[`listItems/${listItemKey}/isCompleted`] = !isCompleted;
+                            return dataToSave;
+                        })
+        }
 
         return update$.switchMap(this.firebaseUpdate.bind(this));
     }

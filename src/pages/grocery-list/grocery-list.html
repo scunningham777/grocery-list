@@ -13,7 +13,7 @@
     <ion-list no-lines *ngFor="let category of (listItemsByCategory$ | async); let first=first; let last=last">
         <ion-list-header *ngIf="!(first && last && category.name == undefined)">{{category.name || "No category"}}</ion-list-header>
         <ion-item-sliding #listItemElem *ngFor="let listItem of category.items">
-            <ion-item (click)="completeItem(listItem.$key)">
+            <ion-item [class.listItem-completed]="listItem.isCompleted" (click)="completeItem(listItem.$key)">
                 {{listItem.itemName}} {{listItem.quantity > 1 ? '(' + listItem.quantity + ')' : ''}}
             </ion-item>
             <ion-item-options>
