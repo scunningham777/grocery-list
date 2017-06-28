@@ -147,7 +147,7 @@ export class ListItemService {
         let itemDiff$: Observable<{oldItemData: ListItem, alteredItemData: ListItem}>;     // alteredItemData should include an updated itemId if applicable
         let update$: Observable<any>;
 
-        itemDiff$ = Observable.combineLatest(this.getListItemById(newItemData.$key), Observable.of(newItemData))
+        itemDiff$ = Observable.combineLatest(this.getListItemById(newItemData.$key).first(), Observable.of(newItemData))
             .switchMap(([oldItem, newItem]) => {
                 if (oldItem.itemName != newItem.itemName) {
                     return this.getOrCreateItemByName(newItem.itemName)
@@ -184,8 +184,10 @@ export class ListItemService {
         const subject = new Subject();
 
         if (!dataToSave || Object.getOwnPropertyNames(dataToSave).length == 0) {
-            subject.next(undefined);
-            subject.complete();
+            setTimeout(() => {
+                subject.next(undefined);
+                subject.complete();
+            }, 15);
         } else {
             this.sdkDb.update(dataToSave)
                 .then(val => {

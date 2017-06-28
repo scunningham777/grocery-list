@@ -30,29 +30,38 @@ export class EditListItemModal {
         }
 
         this.itemSvc.getListItemById(itemId)
+            .first()
             .subscribe(listItem => {
                 this.listItem = listItem;
-                this.loading.dismiss();
+                this.loading.dismiss()
+                    .then(() => {
+                        this.loading = null
+                    });
             })
     }
 
-    presentLoading() {
-        this.loading = this.loadingCtrl.create();
-        this.loading.present();
+    presentLoading(): Promise<any> {
+        if (!this.loading) {
+            this.loading = this.loadingCtrl.create();
+            return this.loading.present();
+        } else {
+            return Promise.resolve(this.loading);
+        }
     }
 
     submitUpdate() {
-        this.presentLoading();
-
-        this.itemSvc.updateListItem(this.listItem)
-            .subscribe(() => {
-                this.dismiss();
-            })
+        this.presentLoading()
+            .then(() => {
+                this.itemSvc.updateListItem(this.listItem)
+                    .subscribe(() => {
+                        this.dismiss();
+                    })
+            });
     }   
 
     dismiss() {
         if (!!this.loading) {
-            //this.loading.dismiss();
+            this.loading.dismiss();
         }
         this.viewCtrl.dismiss();
     }
