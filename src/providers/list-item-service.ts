@@ -35,7 +35,7 @@ export class ListItemService {
                         return listItemIds.map(liId => this.getListItemById(liId.$key))
                     }
                 })
-            .mergeMap(listItem$s => Observable.combineLatest(listItem$s))
+            .mergeMap((listItem$s: Observable<ListItem>[]) => Observable.combineLatest(listItem$s))
 
         return listItems$;
     }
