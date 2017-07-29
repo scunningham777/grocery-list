@@ -16,6 +16,7 @@ export class GroceryListPage {
     public list: List;
     public listItems$: Observable<ListItem[]>;
     public listItemsByCategory$: Observable<any[]>;
+    public hasCompletedItems$: Observable<boolean>;
 
     constructor(
         public navParams: NavParams,
@@ -54,6 +55,12 @@ export class GroceryListPage {
                     }
                 })
             })
+
+        this.hasCompletedItems$ = this.listItems$
+            .map((listItems: ListItem[]) => {
+                const completedItem = listItems.find((listItem: ListItem) => listItem.isCompleted);
+                return completedItem != null;
+            })
     }
 
     createAndAddListItem() {
@@ -79,8 +86,10 @@ export class GroceryListPage {
             })
     }
 
-    editItem(listItemId: string, itemElem: ItemSliding) {
-        itemElem.close();
+    editItem(listItemId: string, itemElem?: ItemSliding) {
+        if (!!itemElem) {
+            itemElem.close();
+        }
         this.presentEditModal(listItemId);
     }
 
@@ -89,8 +98,24 @@ export class GroceryListPage {
         modal.present();
     }
 
-    deleteItem(listItemId: string, itemElem: ItemSliding) {
-        itemElem.close();
+    deleteItem(listItemId: string, itemElem?: ItemSliding) {
+        if(!!itemElem) {
+            itemElem.close();
+        }
         this.itemSvc.deleteListItem(this.list.$key, listItemId);
+    }
+
+    deleteCompletedItems() {
+        if (!!this.list) {
+            this.itemSvc.getAllListItemsForList(this.list.$key)
+                .first()
+                .do((listItems: ListItem[]) => {
+                    const completedItems: ListItem[] = listItems.filter((item: ListItem) => item.isCompleted);
+                    for (let completedItem of completedItems) {
+                        this.deleteItem(completedItem.$key);
+                    }
+                })
+                .subscribe();
+        }
     }
 }

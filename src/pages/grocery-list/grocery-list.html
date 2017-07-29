@@ -26,4 +26,7 @@
             </ion-item-options>
         </ion-item-sliding>
     </ion-list>
+    <button *ngIf="hasCompletedItems$ | async" ion-button (click)="deleteCompletedItems()">
+        Delete all completed items
+    </button>
 </ion-content>
