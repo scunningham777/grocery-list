@@ -94,7 +94,7 @@ export class GroceryListPage {
     }
 
     presentEditModal(listItemId: string) {
-        let modal = this.modalCtrl.create('EditListItemModal', { listItemId: listItemId });
+        let modal = this.modalCtrl.create('EditListItemModal', { listItemId: listItemId, sourceListId: this.list.$key });
         modal.present();
     }
 

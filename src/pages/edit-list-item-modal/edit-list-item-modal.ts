@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { IonicPage, ViewController, NavParams, Loading, LoadingController } from 'ionic-angular';
 import { ListItemService } from '../../providers/list-item-service';
-import { ListItem } from '../../models/models';
+import { ListService } from '../../providers/list-service';
+import { ListItem, List } from '../../models/models';
 
 @IonicPage()
 @Component({
@@ -10,22 +11,31 @@ import { ListItem } from '../../models/models';
 })
 export class EditListItemModal {
     public listItem: ListItem;
+    public sourceListId: string;
     public itemName: string;
     public quantity: string;
-    public loading: Loading
+    public loading: Loading;
+    public availableTransferLists: List[];
+    public selectedTransferListId: string;
 
     constructor(
         public viewCtrl: ViewController,
         public navParams: NavParams,
         public loadingCtrl: LoadingController,
-        public itemSvc: ListItemService
+        public itemSvc: ListItemService,
+        public listSvc: ListService,
     ) {
         this.presentLoading();
 
         const itemId = navParams.get('listItemId');
+        this.sourceListId = navParams.get('sourceListId');
 
         if(!itemId) {
             console.error('No id passed to EditListItemModal');
+            this.dismiss();
+        }
+        if(!this.sourceListId) {
+            console.error('No source list id passed to EditListItemModal');
             this.dismiss();
         }
 
@@ -37,6 +47,11 @@ export class EditListItemModal {
                     .then(() => {
                         this.loading = null
                     });
+            })
+        this.listSvc.getAllActiveLists()
+            .first()
+            .subscribe((activeLists: List[]) => {
+                this.availableTransferLists = activeLists.filter((list: List) => list.$key != this.sourceListId);
             })
     }
 
@@ -52,7 +67,7 @@ export class EditListItemModal {
     submitUpdate() {
         this.presentLoading()
             .then(() => {
-                this.itemSvc.updateListItem(this.listItem)
+                this.itemSvc.updateListItem(this.listItem, this.sourceListId, this.selectedTransferListId)
                     .subscribe(() => {
                         this.dismiss();
                     })

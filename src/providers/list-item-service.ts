@@ -144,7 +144,7 @@ export class ListItemService {
         this.firebaseUpdate(dataToSave);
     }
 
-    updateListItem(newItemData: ListItem): Observable<any> {
+    updateListItem(newItemData: ListItem, sourceListId: string, updatedListId: string): Observable<any> {
         let itemDiff$: Observable<{oldItemData: ListItem, alteredItemData: ListItem}>;     // alteredItemData should include an updated itemId if applicable
         let update$: Observable<any>;
 
@@ -173,6 +173,11 @@ export class ListItemService {
                 if (oldItemData.itemId != alteredItemData.itemId) {
                     dataToSave[`listItems/${oldItemData.$key}/itemId`] = alteredItemData.itemId;
                     dataToSave[`items/${alteredItemData.itemId}`] = {name: alteredItemData.itemName, categoryId: alteredItemData.categoryId};
+                }
+
+                if (sourceListId != updatedListId) {
+                    dataToSave[`listItemsPerList/${sourceListId}/${newItemData.$key}`] = null;
+                    dataToSave[`listItemsPerList/${updatedListId}/${newItemData.$key}`] = true;
                 }
                 
                 return dataToSave;

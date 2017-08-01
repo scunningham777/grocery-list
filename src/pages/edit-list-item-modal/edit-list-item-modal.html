@@ -19,6 +19,12 @@
             <ion-label floating>Quantity</ion-label>
             <ion-input [(ngModel)]="listItem.quantity" type="number"></ion-input>
         </ion-item>
+        <ion-item>
+            <ion-label stacked>Move to another list:</ion-label>
+            <ion-select [(ngModel)]="selectedTransferListId">
+                <ion-option *ngFor="let list of availableTransferLists" [value]="list.$key">{{list.name}}</ion-option>
+            </ion-select>
+        </ion-item>
     </ion-list>
     <button ion-button block [disabled]="!listItem.itemName" (click)="submitUpdate()">Update</button>
 </ion-content>
