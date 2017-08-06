@@ -7,7 +7,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
     templateUrl: 'app.html'
 })
 export class GroshApp {
-    rootPage: any = 'TabsPage';
+    // rootPage: any = 'TabsPage';
+    rootPage: any = 'ListsPage';
 
     constructor(
         platform: Platform, 
