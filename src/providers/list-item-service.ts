@@ -175,7 +175,7 @@ export class ListItemService {
                     dataToSave[`items/${alteredItemData.itemId}`] = {name: alteredItemData.itemName, categoryId: alteredItemData.categoryId};
                 }
 
-                if (sourceListId != updatedListId) {
+                if (updatedListId != null && sourceListId != updatedListId) {
                     dataToSave[`listItemsPerList/${sourceListId}/${newItemData.$key}`] = null;
                     dataToSave[`listItemsPerList/${updatedListId}/${newItemData.$key}`] = true;
                 }

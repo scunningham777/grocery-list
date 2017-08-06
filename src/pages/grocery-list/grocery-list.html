@@ -10,6 +10,9 @@
 </ion-header>
 
 <ion-content padding>
+    <div *ngIf="!isListItemsLoading && (listItemsByCategory$ | async).length == 0" tappable (click)="createAndAddListItem()">
+        No items on this list yet! Click the "+" button above (or just click here) to add an item.
+    </div>
     <ion-list no-lines *ngFor="let category of (listItemsByCategory$ | async); let first=first; let last=last">
         <ion-list-header *ngIf="!(first && last && category.name == undefined)">{{category.name || "No category"}}</ion-list-header>
         <ion-item-sliding #listItemElem *ngFor="let listItem of category.items">
@@ -27,6 +30,6 @@
         </ion-item-sliding>
     </ion-list>
     <button *ngIf="hasCompletedItems$ | async" ion-button (click)="deleteCompletedItems()">
-        Delete all completed items
+        Delete all crossed-off items
     </button>
 </ion-content>

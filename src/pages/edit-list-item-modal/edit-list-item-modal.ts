@@ -78,6 +78,6 @@ export class EditListItemModal {
         if (!!this.loading) {
             this.loading.dismiss();
         }
-        this.viewCtrl.dismiss();
+        this.viewCtrl.dismiss({editedItem: this.listItem, transferListId: this.selectedTransferListId});
     }
 }

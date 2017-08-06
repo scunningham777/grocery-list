@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavParams, ModalController, ItemSliding } from 'ionic-angular';
+import { IonicPage, NavParams, ModalController, ItemSliding, ToastController } from 'ionic-angular';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/do';
 
@@ -16,19 +16,22 @@ export class GroceryListPage {
     public list: List;
     public listItems$: Observable<ListItem[]>;
     public listItemsByCategory$: Observable<any[]>;
+    public isListItemsLoading: boolean;
     public hasCompletedItems$: Observable<boolean>;
 
     constructor(
         public navParams: NavParams,
         public listSvc: ListService,
         public itemSvc: ListItemService,
-        public modalCtrl: ModalController
+        public modalCtrl: ModalController,
+        public toastCtrl: ToastController,
     ) {
         listSvc.getListById(navParams.get('listId'))
             .subscribe(list => {
                 this.list = list;
             });
 
+        this.isListItemsLoading = true;
         this.listItems$ = itemSvc.getAllListItemsForList(navParams.get('listId'));
         this.listItemsByCategory$ = this.listItems$
             .map((listItems: ListItem[]) => {
@@ -54,6 +57,9 @@ export class GroceryListPage {
                         return a.name.localeCompare(b.name);
                     }
                 })
+            })
+            .do(() => {
+                this.isListItemsLoading = false;
             })
 
         this.hasCompletedItems$ = this.listItems$
@@ -95,7 +101,26 @@ export class GroceryListPage {
 
     presentEditModal(listItemId: string) {
         let modal = this.modalCtrl.create('EditListItemModal', { listItemId: listItemId, sourceListId: this.list.$key });
+        modal.onDidDismiss(this.handleEditCallback.bind(this));
         modal.present();
+    }
+
+    handleEditCallback (data: {editedItem: ListItem, transferListId?: string}) {
+        if (!!data && !!data.transferListId) {
+            //get new list name
+            this.listSvc.getListById(data.transferListId)
+                .subscribe((newList: List) => {
+                    //create toast
+                    const toastMsg = `Item '${data.editedItem.itemName}' moved to list '${newList.name}'`;
+                    const movedToast = this.toastCtrl.create({
+                        message: toastMsg,
+                        duration: 3000,
+                        position: 'top'
+                    })
+                    //present
+                    movedToast.present();
+                })
+        }       
     }
 
     deleteItem(listItemId: string, itemElem?: ItemSliding) {
